@@ -5,6 +5,7 @@ from kivymd.app import MDApp
 game_ends = False
 winner = ""
 move_count = 0
+player = ""
 
 ########## MINIMAX ALGORITHM ##########
 #initialize board configuration
@@ -14,26 +15,62 @@ for i in range(CELLS_COUNT):
     board_configuration.append("")
 
 # checks if state is terminal (i.e. final state) and returns result
-def terminal(s):
+def terminal(state):
+    utility = -1
     if move_count > 2:
         # check if first corner
-        if board_configuration[0]:
+        if state[0]:
             # row
-            if board_configuration[0] == board_configuration[1] == board_configuration[2]: 
-                return True, board_configuration[0]
+            if state[0] == state[1] == state[2]: 
+                if state[0] == player:
+                    utility = 1
+                return True, state[0], utility
             # diagonal
-            elif board_configuration[0] == board_configuration[4] == board_configuration[8]:
-                return True, board_configuration[0]
+            elif state[0] == state[4] == state[8]:
+                if state[0] == player:
+                    utility = 1
+                return True, state[0], utility
             # column
-            elif board_configuration[0] == board_configuration[3] == board_configuration[6]:
-                return True, board_configuration[0] 
+            elif state[0] == state[3] == state[6]:
+                if state[0] == player:
+                    utility = 1
+                return True, state[0], utility
+        # check second cell
+        if state[1]:
+            if state[1] == state[4] == state[7]:
+                if state[1] == player:
+                    utility = 1
+                return True, state[1], utility
+        # check last cell
+        if state[2]:
+            if state[2] == state[5] == state[8]:
+                if state[2] == player:
+                    utility = 1
+                return True, state[2], utility
+            elif state[2] == state[4] == state[6]:
+                if state[2] == player:
+                    utility = 1
+                return True, state[2], utility
+        if state[3]:
+            if state[3] == state[4] == state[5]:
+                if state[3] == player:
+                    utility = 1
+                return True, state[3], utility
+        if state[6]:
+            if state[6] == state[7] == state[8]:
+                if state[6] == player:
+                    utility = 1
+                return True, state[6], utility
 
         # check if the board is filled
         for i in range(CELLS_COUNT):
             if not board_configuration[i]:
                 return False, ""
-        return True, "draw" 
+        return True, "draw", 0
     return False, ""
+   
+# def max_value(state):
+    
                 
 # graphical user interface
 class MainApp (MDApp):
@@ -55,7 +92,9 @@ class MainApp (MDApp):
     
     # set player based on which button the user clicks
     def setTurn(self, btn):
+        global player
         self.current_player = btn.text
+        player = btn.text
         self.turn = btn.text 
         self.disable_buttons()
         self.root.ids.play_button.text = "PLAY"
