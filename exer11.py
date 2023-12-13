@@ -13,21 +13,28 @@ board_configuration = [] # contains the value of each cell
 for i in range(CELLS_COUNT):
     board_configuration.append("")
 
-# checks if state is terminal (i.e. final state)
+# checks if state is terminal (i.e. final state) and returns result
 def terminal(s):
-    terminal = False
-    # start checking only when there's three moves or more
     if move_count > 2:
-        # check if a row of x or o has been formed
+        # check if first corner
+        if board_configuration[0]:
+            # row
+            if board_configuration[0] == board_configuration[1] == board_configuration[2]: 
+                return True, board_configuration[0]
+            # diagonal
+            elif board_configuration[0] == board_configuration[4] == board_configuration[8]:
+                return True, board_configuration[0]
+            # column
+            elif board_configuration[0] == board_configuration[3] == board_configuration[6]:
+                return True, board_configuration[0] 
 
         # check if the board is filled
-        terminal = True
         for i in range(CELLS_COUNT):
             if not board_configuration[i]:
-                terminal = False
-                break
-        return terminal
-
+                return False, ""
+        return True, "draw" 
+    return False, ""
+                
 # graphical user interface
 class MainApp (MDApp):
     def build(self):
@@ -78,7 +85,11 @@ class MainApp (MDApp):
     # check if a player has won
     def check_win(self, btn):
         # iterate over the board to check if all cells are filled
-        game_ends = terminal(board_configuration)
+        checker = terminal(board_configuration)
+        print("checker", checker)
+        game_ends = checker[0]
+        result = checker[1]
+        print(result)
         if game_ends:
             self.end_game(btn);
    
