@@ -4,63 +4,99 @@ MDFloatLayout:
         pos_hint: {'center_x': .5, 'center_y': .7}
         cols: 3
         rows: 3
-
+  
         Button:
             id: btn1
+            index: 0
             text: ""
             font_size: "45sp"
-            on_release: app.presser(btn1)
- 
+            on_release: app.presser(btn1) # call presser function
+            disabled: 'False'  
+
         Button:
             id: btn2
+            index: 1
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn2)
+            disabled: 'False'  
         Button:
             id: btn3
+            index: 2
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn3)
+            disabled: 'False'  
         Button:
             id: btn4
+            index: 3
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn4)
+            disabled: 'False'  
         Button:
             id: btn5
+            index: 4
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn5)
+            disabled: 'False'  
         Button:
             id: btn6
+            index: 5
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn6)
+            disabled: 'False'  
         Button:
             id: btn7
+            index: 6
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn7)
+            disabled: 'False'  
         Button:
             id: btn8
+            index: 7
             text: ""
             font_size: "45sp"
-            on_release: app.presser(btn8)    
+            on_release: app.presser(btn8)  
+            disabled: 'False'  
         Button:
             id: btn9
+            index: 8
             text: ""
             font_size: "45sp"
             on_release: app.presser(btn9)
+            disabled: 'False'  
 
     MDLabel:
-        id: score
+        id: label
         font_size: "32sp"
-        text: "X GOES FIRST"
+        text: "Choose a player first!"
         halign: "center"
-        pos_hint: {"center_y": .3}
+        pos_hint: {"center_y": .35}
+    
+    MDGridLayout:
+        size_hint: .1, .1
+        pos_hint: {'center_x': .5, 'center_y': .25}
+        cols: 2
+        rows: 1
+        Button:
+            id: playerX
+            text: "X"
+            font_size: "45sp"
+            on_release: app.setTurn(playerX)
+        Button:
+            id: playerO
+            text: "O"
+            font_size: "45sp"
+            on_release: app.setTurn(playerO)
+
 
     MDRaisedButton:
-        id: restart
-        text: "Restart game"
+        id: play_button
+        text: "PLAY"
         pos_hint: {'center_x': .5, "center_y": .15}
-        on_release: app.restart()
+        on_release: app.start(play_button)
+        disabled: 'True'

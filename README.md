@@ -8,3 +8,4 @@ Kivy for the GUI
 
 # References
 *Youtube tutorial* - https://youtu.be/PAnpsrEOQ4s
+*KivyMD documentation* - https://kivymd.readthedocs.io/en/1.1.1/getting-started/
