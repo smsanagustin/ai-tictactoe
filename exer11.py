@@ -1,3 +1,4 @@
+import random
 from kivy.lang import Builder
 from kivymd.app import MDApp
 
@@ -6,6 +7,7 @@ game_ends = False
 winner = ""
 move_count = 0
 user_player = ""
+ai_move = "" # saves the next move of the ai (index of the cell)
 
 ########## MINIMAX ALGORITHM ##########
 #initialize board configuration
@@ -44,29 +46,29 @@ def player(state):
     
 # returns all possible moves of current player given a state
 def actions(state):
-    possible_moves = [] 
-    
-    # check first whose turn it is
-    turn = player(state)
-        
     # check all possible configurations
     indices = []
     for i in range(CELLS_COUNT): # track empty cells
         if state[i] == "":
             indices.append(i)
             
-    # create a copy of the board configuration for each possible move
-    for i in range(len(indices)):
-        new_state = []
-        for j in range(CELLS_COUNT):
-            new_state.append(state[j])
-        
-        new_state[indices[i]] = turn
-        possible_moves.append(new_state)
-        
-    return possible_moves
+    return indices
+
+# resulting state when action a is done on a state; action - index of the cell
+def result(state, action):
+    # check whose turn it is
+    turn = player(state) 
     
+    # create a state copy
+    state_copy = []
+    for i in range(CELLS_COUNT):
+        state_copy.append(state[i]) 
     
+    # add move to the current action
+    state_copy[action] = turn
+    
+    return state_copy 
+     
 # checks if state is terminal (i.e. final state) and returns result
 def terminal(state):
     utility = -1
@@ -121,14 +123,25 @@ def terminal(state):
                 return False, "", 0
         return True, "draw", 0
     return False, "", 0
-
-
    
 def max_value(state):
+    v = -1
     if terminal(state)[0]:
         return terminal(state)[2] # state utility is also returned by the terminal
-    
-                
+    for action in actions(state):
+        v = max(v, min_value(result(state, action))) 
+    return v
+        
+def min_value(state):
+    global ai_move # saves the index of the cell that matches the minimized move
+    v = 1
+    if terminal(state)[0]:
+        return terminal(state)[2] # utility is return by terminal at index 2
+    for action in actions(state):
+        v = min(v, max_value(result(state, action)))
+        if v == max_value(result(state,action)):
+            ai_move = action
+    return v                
 # graphical user interface
 class MainApp (MDApp):
     def build(self):
@@ -181,7 +194,10 @@ class MainApp (MDApp):
         if result not in ["X","O"]:
             self.root.ids.label.text = "DRAW!"
         else:
-            self.root.ids.label.text = f"{result} wins!"
+            if result == user_player:
+                self.root.ids.label.text = "You win!"
+            else:
+                self.root.ids.label.text = "AI wins!"
     
     # check if a player has won
     def check_win(self, btn):
@@ -202,7 +218,7 @@ class MainApp (MDApp):
         if self.turn == self.current_player:
             btn.text = self.current_player
             btn.disabled = True
-            self.root.ids.label.text = "AI's turn!"
+            self.root.ids.label.text = "AI is choosing a move..."
             
             # update board configuration (state)
             board_configuration[btn.index] = btn.text
@@ -210,16 +226,26 @@ class MainApp (MDApp):
             move_count += 1
                 
             print(board_configuration)
-            print(actions(board_configuration))
-            
+             
             # who will move next
             if self.current_player == "X":
                 self.turn = "O"
             else:
                 self.turn = "X"
-        
+                     
+            self.check_win(btn) # check first if a player has won 
+            
+            # ai moves
+            # find ai's turn based on the minimax algorithm
+            min_value(board_configuration)
+            print("next move:", str(ai_move)) 
+            
+            # # find the button that corresponds to the cell
+            # corresponding_button = 
+             
+                     
         # ai's turn
-        else:
+        else:  
             if self.current_player == "X":
                 btn.text = "O"
             else:
@@ -238,11 +264,11 @@ class MainApp (MDApp):
                 self.turn = "X"
             else:
                 self.turn = "O"
-             
-        self.check_win(btn) # check first if a player has won
-    
+            
+        self.check_win(btn) # check first if a player has won 
+              
     def start(self, play_button): 
-        global move_count
+        global move_count, ai_move
         # reset move count
         move_count = 0
         
@@ -261,7 +287,12 @@ class MainApp (MDApp):
             self.disable_options()
         
         # update player prompt
-        prompt_text = self.first_player + " goes first."
+        if user_player == "X":
+            prompt_text = self.first_player + " goes first."
+        else:
+            prompt_text = "AI is choosing a move..."
+            ai_move = random.randint(0, 9)
+            print(ai_move)
         self.root.ids.label.text = prompt_text
         play_button.text = "RESTART"
         
