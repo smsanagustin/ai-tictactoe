@@ -51,7 +51,7 @@ def actions(state):
     for i in range(CELLS_COUNT): # track empty cells
         if state[i] == "":
             indices.append(i)
-            
+    print(indices)
     return indices
 
 # resulting state when action a is done on a state; action - index of the cell
@@ -66,82 +66,83 @@ def result(state, action):
     
     # add move to the current action
     state_copy[action] = turn
-    
     return state_copy 
      
 # checks if state is terminal (i.e. final state) and returns result
 def terminal(state):
-    utility = -1
-    if move_count > 2:
-        # check if first corner
-        if state[0]:
-            # row
-            if state[0] == state[1] == state[2]: 
-                if state[0] == user_player:
-                    utility = 1
-                return True, state[0], utility
-            # diagonal
-            elif state[0] == state[4] == state[8]:
-                if state[0] == user_player:
-                    utility = 1
-                return True, state[0], utility
-            # column
-            elif state[0] == state[3] == state[6]:
-                if state[0] == user_player:
-                    utility = 1
-                return True, state[0], utility
-        # check second cell
-        if state[1]:
-            if state[1] == state[4] == state[7]:
-                if state[1] == user_player:
-                    utility = 1
-                return True, state[1], utility
-        # check last cell
-        if state[2]:
-            if state[2] == state[5] == state[8]:
-                if state[2] == user_player:
-                    utility = 1
-                return True, state[2], utility
-            elif state[2] == state[4] == state[6]:
-                if state[2] == user_player:
-                    utility = 1
-                return True, state[2], utility
-        if state[3]:
-            if state[3] == state[4] == state[5]:
-                if state[3] == user_player:
-                    utility = 1
-                return True, state[3], utility
-        if state[6]:
-            if state[6] == state[7] == state[8]:
-                if state[6] == user_player:
-                    utility = 1
-                return True, state[6], utility
+    utility = 0
+    # if move_count > 2:
+    # check if first corner
+    if state[0]:
+        # row
+        if state[0] == state[1] == state[2]: 
+            if state[0] == user_player:
+                utility = 1
+            return True, state[0], utility
+        # diagonal
+        elif state[0] == state[4] == state[8]:
+            if state[0] == user_player:
+                utility = 1
+            return True, state[0], utility
+        # column
+        elif state[0] == state[3] == state[6]:
+            if state[0] == user_player:
+                utility = 1
+            return True, state[0], utility
+    # check second cell
+    if state[1]:
+        if state[1] == state[4] == state[7]:
+            if state[1] == user_player:
+                utility = 1
+            return True, state[1], utility
+    # check last cell
+    if state[2]:
+        if state[2] == state[5] == state[8]:
+            if state[2] == user_player:
+                utility = 1
+            print("matched: utility is ", utility)
+            return True, state[2], utility
+        elif state[2] == state[4] == state[6]:
+            if state[2] == user_player:
+                utility = 1
+            return True, state[2], utility
+    if state[3]:
+        if state[3] == state[4] == state[5]:
+            if state[3] == user_player:
+                utility = 1
+            return True, state[3], utility
+    if state[6]:
+        if state[6] == state[7] == state[8]:
+            if state[6] == user_player:
+                utility = 1
+            return True, state[6], utility
 
-        # check if the board is filled
-        for i in range(CELLS_COUNT):
-            if not board_configuration[i]:
-                return False, "", 0
-        return True, "draw", 0
+    # check if the board is filled
+    for i in range(CELLS_COUNT):
+        if not state[i]:
+            return False, "", 0
+    return True, "draw", 0
     return False, "", 0
-   
-def max_value(state):
-    v = -1
-    if terminal(state)[0]:
-        return terminal(state)[2] # state utility is also returned by the terminal
-    for action in actions(state):
-        v = max(v, min_value(result(state, action))) 
-    return v
-        
+    
 def min_value(state):
     global ai_move # saves the index of the cell that matches the minimized move
-    v = 1
     if terminal(state)[0]:
-        return terminal(state)[2] # utility is return by terminal at index 2
+        return terminal(state)[2] # utility is returned by terminal at index 2
+    v = float('inf')
     for action in actions(state):
         v = min(v, max_value(result(state, action)))
         if v == max_value(result(state,action)):
             ai_move = action
     return v                
+
+def max_value(state):
+    if terminal(state)[0]:
+        return terminal(state)[2] # state utility is also returned by the terminal  
+    v = float('-inf')
+    for action in actions(state):
+        v = max(v, min_value(result(state, action))) 
+    return v
+
 # graphical user interface
 class MainApp (MDApp):
     def build(self):
@@ -153,7 +154,22 @@ class MainApp (MDApp):
     first_player = "X"
     turn = ""
     current_player = ""
+    buttons_list = []
+    
+    def save_buttons(self):
+        self.buttons_list = [
+        self.root.ids.btn1,
+        self.root.ids.btn2,
+        self.root.ids.btn3,
+        self.root.ids.btn4,
+        self.root.ids.btn5,
+        self.root.ids.btn6,
+        self.root.ids.btn7,
+        self.root.ids.btn8,
+        self.root.ids.btn9,
+    ]
 
+    
     def disable_options(self):
         self.root.ids.playerX.disabled = True
         self.root.ids.playerO.disabled = True
@@ -210,7 +226,31 @@ class MainApp (MDApp):
         if game_ends:
             print(utility)
             self.end_game(result);
-   
+            
+    # executes when AI moves
+    def AI_presser(self, btn):
+        self.disable_options()
+        
+        print("turn: ", self.turn);
+        btn.text = self.turn
+        btn.disabled = True
+        self.root.ids.label.text = "Your move!"
+        
+        # update board configuration (state)
+        board_configuration[btn.index] = btn.text
+        global move_count
+        move_count += 1
+            
+        print(board_configuration)
+            
+        # who will move next
+        if self.current_player == "X":
+            self.turn = "X"
+        else:
+            self.turn = "O" 
+            
+        self.check_win(btn) # check first if a player has won 
+            
     # executes when a button is clicked
     def presser(self, btn): 
         self.disable_options()
@@ -226,30 +266,26 @@ class MainApp (MDApp):
             move_count += 1
                 
             print(board_configuration)
+            result(board_configuration, 1)
              
             # who will move next
             if self.current_player == "X":
                 self.turn = "O"
             else:
                 self.turn = "X"
-                     
-            self.check_win(btn) # check first if a player has won 
-            
-            # ai moves
+                 
             # find ai's turn based on the minimax algorithm
             min_value(board_configuration)
-            print("next move:", str(ai_move)) 
-            
-            # # find the button that corresponds to the cell
-            # corresponding_button = 
-             
+            print("next move:", str(ai_move))  
+            # # finds button that corresponds to ai's chosen move
+            # for button in self.buttons_list:
+            #     if button.index == ai_move:
+            #         self.AI_presser(button)
+            #         break 
                      
         # ai's turn
         else:  
-            if self.current_player == "X":
-                btn.text = "O"
-            else:
-                btn.text = "X" 
+            btn.text = self.turn
                 
             btn.disabled = True
             self.root.ids.label.text = "Your turn!"
@@ -264,13 +300,18 @@ class MainApp (MDApp):
                 self.turn = "X"
             else:
                 self.turn = "O"
-            
+       
+        
+        print(terminal(board_configuration))
         self.check_win(btn) # check first if a player has won 
-              
+             
     def start(self, play_button): 
         global move_count, ai_move
         # reset move count
         move_count = 0
+        
+        # save buttons
+        self.save_buttons()
         
         # set turn
         self.turn = self.first_player # X always goes first
