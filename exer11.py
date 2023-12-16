@@ -220,6 +220,18 @@ class MainApp (MDApp):
         self.root.ids.btn7.disabled = True
         self.root.ids.btn8.disabled = True
         self.root.ids.btn9.disabled = True
+        
+    def enable_buttons(self):
+         # enable all buttons again
+        self.root.ids.btn1.disabled = False
+        self.root.ids.btn2.disabled = False
+        self.root.ids.btn3.disabled = False
+        self.root.ids.btn4.disabled = False
+        self.root.ids.btn5.disabled = False
+        self.root.ids.btn6.disabled = False
+        self.root.ids.btn7.disabled = False
+        self.root.ids.btn8.disabled = False
+        self.root.ids.btn9.disabled = False
     
     # ends the game
     def end_game(self, result):
@@ -344,24 +356,14 @@ class MainApp (MDApp):
         # update player prompt
         if user_player == "X":
             prompt_text = self.first_player + " goes first."
+            self.enable_buttons()
         else:
             prompt_text = "AI is choosing a move..."
             ai_move = random.randint(0, 9)
 
         self.root.ids.label.text = prompt_text
-        play_button.text = "RESTART"
-        
-        # enable all buttons again
-        self.root.ids.btn1.disabled = False
-        self.root.ids.btn2.disabled = False
-        self.root.ids.btn3.disabled = False
-        self.root.ids.btn4.disabled = False
-        self.root.ids.btn5.disabled = False
-        self.root.ids.btn6.disabled = False
-        self.root.ids.btn7.disabled = False
-        self.root.ids.btn8.disabled = False
-        self.root.ids.btn9.disabled = False
-        
+        play_button.text = "RESTART" 
+                 
         # clear buttons
         self.root.ids.btn1.text = ""
         self.root.ids.btn2.text = ""
@@ -371,14 +373,15 @@ class MainApp (MDApp):
         self.root.ids.btn6.text = ""
         self.root.ids.btn7.text = ""
         self.root.ids.btn8.text = ""
-        self.root.ids.btn9.text = ""
-       
+        self.root.ids.btn9.text = ""   
+        
         # if it's ai's turn, let the ai move
         if user_player == "O":
             for button in self.buttons_list:
                 if button.index == ai_move:
+                    self.enable_buttons()
                     self.AI_presser(button)
-                    break  
+                    break   
     
 MainApp().run()
 
