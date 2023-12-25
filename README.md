@@ -7,5 +7,6 @@ Kivy for the GUI
 `pip3 install kivymd`
 
 # References
-*Youtube tutorial* - https://youtu.be/PAnpsrEOQ4s\n
+*Youtube tutorial* - https://youtu.be/PAnpsrEOQ4s
+
 *KivyMD documentation* - https://kivymd.readthedocs.io/en/1.1.1/getting-started/
