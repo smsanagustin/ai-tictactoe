@@ -7,7 +7,6 @@ game_ends = False
 winner = ""
 move_count = 0
 user_player = ""
-# ai_move = "" # saves the next move of the ai (index of the cell)
 
 ########## MINIMAX ALGORITHM ##########
 #initialize board configuration
@@ -310,24 +309,6 @@ class MainApp (MDApp):
                     self.AI_presser(button)
                     break 
                      
-        # ai's turn
-        # else:  
-        #     btn.text = self.turn
-                
-        #     btn.disabled = True
-        #     self.root.ids.label.text = "Your turn!"
-
-        #     # update board configuration (state)
-        #     board_configuration[btn.index] = btn.text
-        #     move_count += 1
-                
-             
-        #     if self.current_player == "X":
-        #         self.turn = "X"
-        #     else:
-        #         self.turn = "O"
-       
-        
         # print(terminal(board_configuration))
         self.check_win(btn) # check first if a player has won 
              
